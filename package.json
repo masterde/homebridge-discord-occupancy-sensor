@@ -1,43 +1,53 @@
 {
-  "name": "homebridge-network-presence",
-  "version": "1.2.3",
-  "description": "Homebridge plugin that provides occupancy sensors for devices presence in your network",
+  "name": "homebridge-discord-occupancy-sensor",
+  "version": "1.0.0",
+  "description": "Homebridge plugin that provides occupancy sensors based on Discord user presence",
   "main": "index.js",
   "keywords": [
     "homebridge-plugin"
   ],
-  "homepage": "https://github.com/nitaybz/homebridge-network-presence#readme",
+  "homepage": "https://github.com/<your-github-username>/homebridge-discord-occupancy-sensor#readme",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nitaybz/homebridge-network-presence.git"
+    "url": "git+https://github.com/<your-github-username>/homebridge-discord-occupancy-sensor.git"
   },
   "bugs": {
-    "url": "https://github.com/nitaybz/homebridge-network-presence/issues"
+    "url": "https://github.com/<your-github-username>/homebridge-discord-occupancy-sensor/issues"
   },
   "engines": {
-    "node": ">=10.17.0",
-    "homebridge": ">=0.4.4"
+    "node": ">=14.0.0",
+    "homebridge": ">=1.3.0"
   },
   "dependencies": {
-    "local-devices": "^3.1.0"
+    "discord.js": "^13.1.0",
+    "hap-nodejs": "^1.6.0"
   },
   "scripts": {
-    "start": "homebridge --plugin-path ./",
-    "debug": "DEBUG=* homebridge --debug --plugin-path ./"
+    "start": "homebridge",
+    "debug": "DEBUG=* homebridge -D"
+  },
+  "author": "<your-name>",
+  "homepage": "https://github.com/<your-github-username>/homebridge-discord-occupancy-sensor",
+  "bugs": {
+    "url": "https://github.com/<your-github-username>/homebridge-discord-occupancy-sensor/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-github-username>/homebridge-discord-occupancy-sensor.git"
   },
   "funding": [
     {
       "type": "paypal",
-      "url": "https://paypal.me/nitaybz"
+      "url": "https://paypal.me/<your-paypal-username>"
     },
     {
       "type": "patreon",
-      "url": "https://www.patreon.com/nitaybz"
+      "url": "https://www.patreon.com/<your-patreon-username>"
     },
     {
-      "type": "kofi",
-      "url": "https://ko-fi.com/nitaybz"
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/<your-kofi-username>"
     }
   ]
 }

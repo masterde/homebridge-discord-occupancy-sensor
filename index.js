@@ -1,47 +1,99 @@
-const Network = require('./lib/network')
-const PLUGIN_NAME = 'homebridge-network-presence'
-const PLATFORM_NAME = 'NetworkPresence'
+const { Accessory, Service, Characteristic } = require("hap-nodejs");
+const DiscordObserver = require("./lib/discordObserver");
+
+const PLUGIN_NAME = "homebridge-discord-occupancy-sensor";
+const PLATFORM_NAME = "DiscordOccupancySensor";
+
 module.exports = (api) => {
-	api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, NetworkPresence)
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensorPlatform);
+};
+
+class DiscordOccupancySensorPlatform {
+  constructor(log, config, api) {
+    this.log = log;
+    this.api = api;
+    this.accessories = [];
+    this.devicesConfig = config.devices || [];
+    this.users = config.users || [];
+    this.botToken = config.botToken || "";
+
+    this.discordObserver = new DiscordObserver(this.botToken, this.users);
+    this.discordObserver.on("discord-user:<user-id>:status:<status>", (user) => {
+      const userId = user.id;
+      const status = this.discordObserver.getStatus(userId);
+      this.accessories.forEach((accessory) => {
+        if (accessory.context.serial === userId) {
+          const occupancyDetected = status === "online";
+          accessory
+            .getService(Service.OccupancySensor)
+            .setCharacteristic(
+              Characteristic.OccupancyDetected,
+              occupancyDetected
+            );
+        }
+      });
+    });
+
+    this.api.on("didFinishLaunching", () => {
+      removeCachedDevices.bind(this)();
+      init.bind(this)();
+    });
+  }
+
+  configureAccessory(accessory) {
+    this.log(`Found Cached Accessory: ${accessory.displayName} (${accessory.context.serial}) `);
+    this.accessories.push(accessory);
+  }
 }
 
-class NetworkPresence {
+const removeCachedDevices = function () {
+  this.accessories.forEach((accessory) => {
+    if (
+      accessory.context.serial === "12:34:56:78:9a:bc" &&
+      accessory.displayName === "Anyone"
+    ) {
+      // If it's the 'Anyone' sensor
+      return;
+    }
 
-	constructor(log, config, api) {
-		this.api = api
-		this.log = log
+    const deviceInConfig = this.devicesConfig.find(
+      (device) =>
+        (device.mac &&
+          device.mac.toLowerCase() === accessory.context.serial) ||
+        device.ip === accessory.context.serial ||
+        (device.hostname &&
+          device.hostname.toLowerCase() === accessory.context.serial)
+    );
+    if (!deviceInConfig) {
+      // Unregister accessory if it is no longer in the config
+      this.log(
+        `Unregistering disconnected device: "${accessory.displayName}" (${accessory.context.serial})`
+      );
+      this.api.unregisterPlatformAccessories(
+        PLUGIN_NAME,
+        PLATFORM_NAME,
+        [accessory]
+      );
+    }
+  });
+};
 
-		this.accessories = []
-		this.devices = []
-		this.PLUGIN_NAME = PLUGIN_NAME
-		this.PLATFORM_NAME = PLATFORM_NAME
-		this.name = config.name || PLATFORM_NAME
-		this.interval = config.interval ? config.interval * 1000 : 10000
-		this.threshold = !config.threshold && config.threshold !== 0 ? 15 : config.threshold
-		this.anyoneSensor = config.anyoneSensor
-		this.devicesConfig = config.devices || []
-		this.debug = config.debug || false
-		this.range = config.addressRange || ''
+const init = function () {
+  this.log(`Initiating Discord Observer...`);
+  this.devicesConfig.forEach((device) => {
+    if (this.users.includes(device.id)) {
+      const userId = device.id;
+      const displayName = device.name || userId;
+      const accessory = new Accessory(displayName, userId, this);
+      accessory.addService(Service.OccupancySensor, displayName);
+      this.accessories.push(accessory);
+    }
+  });
 
-		
-		// define debug method to output debug logs when enabled in the config
-		this.log.easyDebug = (...content) => {
-			if (this.debug) {
-				this.log(content.reduce((previous, current) => {
-					return previous + ' ' + current
-				}))
-			} else
-				this.log.debug(content.reduce((previous, current) => {
-					return previous + ' ' + current
-				}))
-		}
-
-		this.api.on('didFinishLaunching', Network.init.bind(this))
-
-	}
-
-	configureAccessory(accessory) {
-		this.log.easyDebug(`Found Cached Accessory: ${accessory.displayName} (${accessory.context.serial}) `)
-		this.accessories.push(accessory)
-	}
-}
+  if (config.anyoneSensor) {
+    const displayName = "Anyone";
+    const accessory = new Accessory(displayName, "12:34:56:78:9a:bc", this);
+    accessory.addService(Service.OccupancySensor, displayName);
+    this.accessories.push(accessory);
+  }
+};

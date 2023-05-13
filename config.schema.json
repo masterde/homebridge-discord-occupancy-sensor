@@ -1,134 +1,50 @@
 {
-  "pluginAlias": "NetworkPresence",
-  "pluginType": "platform",
-  "singular": true,
-  "headerDisplay": "Homebridge plugin that provides occupancy sensors for devices presence in your network",
-  "footerDisplay": "Created by @nitaybz",
+  "pluginAlias": "DiscordOccupancy",
+  "pluginType": "accessory",
+  "headerDisplay": "Homebridge plugin that creates an occupancy sensor in HomeKit based on the online status of a Discord user",
+  "footerDisplay": "Created by @your_username_here",
   "schema": {
-      "type": "object",
-      "properties": {
-          "debug": {
-              "title": "Enable Debug Logs",
-              "description": "When checked, the plugin will produce extra logs for debugging purposes",
-              "type": "boolean",
-              "default": false,
-              "required": false
-          },
-          "interval": {
-              "title": "Polling Interval for New Devices (seconds)",
-              "description": "Time in seconds between status polling",
-              "type": "integer",
-              "default": 10,
-              "minimum": 1,
-              "maximum": 60
-          },
-          "threshold": {
-              "title": "Disconnect Threshold (minutes)",
-              "description": "Time in minutes to wait before updating 'disconnected' status",
-              "type": "integer",
-              "required": true,
-              "default": 15,
-              "minimum": 0,
-              "maximum": 60
-          },
-          "anyoneSensor": {
-              "title": "Enable Anyone Sensor",
-              "description": "When checked, the plugin will create extra accessory named \"Anyone\" to represent if ANY of the devices is detected",
-              "type": "boolean",
-              "default": false,
-              "required": false
-          },
-          "addressRange": {
-              "title": "Address Range",
-              "description": "Define the address range of your devices to speed up discovery (e.g. \"10.0.0.0/24\", \"10.0.0.1-10.0.0.30\")",
-              "type": "string",
-              "default": "",
-              "required": false
-          },
-          "devices": {
-              "type": "array",
-              "items": {
-                "title": "Network Devices",
-                "type": "object",
-                "properties": {
-
-                  "name": {
-                      "title": "Name of the Accessory",
-                      "type": "string",
-                      "required": true
-                  },
-                  "mac": {
-                      "title": "Device Mac Address",
-                      "type": "string",
-                      "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$"
-                  },
-                  "ip": {
-                      "title": "Device IP Address",
-                      "type": "string"
-                  },
-                  "hostname": {
-                      "title": "Device Hostname",
-                      "type": "string"
-                  },
-                  "threshold": {
-                      "title": "Disconnect Threshold (minutes)",
-                      "description": "Time in minutes to wait before updating 'disconnected' status",
-                      "type": "integer",
-                      "default": 15,
-                      "minimum": 0,
-                      "maximum": 60
-                  }
-                },
-                "oneOf": [
-                    {
-                        "required": [
-                            "mac"
-                        ]
-                    },
-                    {
-                        "required": [
-                            "ip"
-                        ]
-                    },
-                    {
-                        "required": [
-                            "hostname"
-                        ]
-                    }
-                  ]
-              }
-          }
+    "type": "object",
+    "properties": {
+      "debug": {
+        "title": "Enable Debug Logs",
+        "description": "When checked, the plugin will produce extra logs for debugging purposes",
+        "type": "boolean",
+        "default": false,
+        "required": false
+      },
+      "token": {
+        "title": "Discord Bot Token",
+        "description": "The token for your Discord bot",
+        "type": "string",
+        "required": true
+      },
+      "userId": {
+        "title": "Discord User ID",
+        "description": "The ID of the Discord user to monitor",
+        "type": "string",
+        "required": true
+      },
+      "name": {
+        "title": "Sensor Name",
+        "description": "The name of the occupancy sensor to create in HomeKit",
+        "type": "string",
+        "required": true
       }
+    }
   },
-    "layout": [
-      {
-        "key": "interval"
-      },
-      {
-        "key": "threshold"
-      },
-      {
-        "key": "anyoneSensor"
-      },
-      {
-        "key": "addressRange"
-      },
-      {
-        "key": "devices",
-        "type": "array",
-        "title": "Network Devices",
-        "orderable": false,
-        "buttonText": "Add Device",
-        "items": [
-          "devices[].name",
-          "devices[].mac",
-          "devices[].ip",
-          "devices[].hostname",
-          "devices[].threshold"
-        ]
-      },
-      {
-        "key": "debug"
-      }
-    ]
+  "layout": [
+    {
+      "key": "token"
+    },
+    {
+      "key": "userId"
+    },
+    {
+      "key": "name"
+    },
+    {
+      "key": "debug"
+    }
+  ]
 }
