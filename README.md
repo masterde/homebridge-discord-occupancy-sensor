@@ -1,102 +1,76 @@
-<img src="branding/network_homebridge.png" width="500px">
+# homebridge-discord-occupancy-sensor
 
-# homebridge-network-presence
+[![Downloads](https://img.shields.io/npm/dt/homebridge-discord-occupancy-sensor.svg?color=critical)](https://www.npmjs.com/package/homebridge-discord-occupancy-sensor)
+[![Version](https://img.shields.io/npm/v/homebridge-discord-occupancy-sensor)](https://www.npmjs.com/package/homebridge-discord-occupancy-sensor)
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+[![Homebridge Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=discord)](https://discord.gg/7DyabQ6)
 
-[![Downloads](https://img.shields.io/npm/dt/homebridge-network-presence.svg?color=critical)](https://www.npmjs.com/package/homebridge-network-presence)
-[![Version](https://img.shields.io/npm/v/homebridge-network-presence)](https://www.npmjs.com/package/homebridge-network-presence)<br>
-[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins) [![Homebridge Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=discord)](https://discord.gg/7DyabQ6)<br>
-[![certified-hoobs-plugin](https://badgen.net/badge/HOOBS/Certified/yellow)](https://plugins.hoobs.org?ref=10876) [![hoobs-support](https://badgen.net/badge/HOOBS/Support/yellow)](https://support.hoobs.org?ref=10876)
+[Homebridge](https://github.com/nfarina/homebridge) plugin that provides occupancy sensors based on Discord user presence.
 
-[Homebridge](https://github.com/nfarina/homebridge) plugin that provides occupancy sensors for devices presence on your network based on mac address or IP.
+## Requirements
 
-### Requirements
+- Node.js version 14 or higher
+- Homebridge version 1.3.0 or higher
 
-<img src="https://img.shields.io/badge/node-%3E%3D10.17-brightgreen"> &nbsp;
-<img src="https://img.shields.io/badge/homebridge-%3E%3D0.4.4-brightgreen">
+Check your Node.js and Homebridge versions with `node -v` and `homebridge -V` respectively, and update as needed.
 
-check with: `node -v` & `homebridge -V` and update if needed
+## Installation
 
-## Description
+This plugin can be installed and configured through the Homebridge UI or the command line.
 
-This plugin was inspired by the old [homebridge-people](https://github.com/PeteLawrence/homebridge-people) plugin by @PeteLawrence and it's fork, [homebridge-people plus](https://github.com/Glavin001/homebridge-people-plus) by @Glavin001.
+### Install via Homebridge UI
 
-I created this plugin due to the lack of updated, supported and maintained plugin to check devices on your current network.
+1. Open the Homebridge UI
+2. Navigate to the Plugins tab
+3. Search for "discord occupancy sensor"
+4. Click Install
 
-With this plugin you can easily configure devices to monitor based on their mac address, ip address or hostname.
+### Install via Command Line
 
-# Installation
+1. Install Homebridge: `sudo npm install -g homebridge --unsafe-perm`
+2. Install this plugin: `sudo npm install -g homebridge-discord-occupancy-sensor`
+3. Update your Homebridge configuration file. See `config-sample.json` in this repository for a sample.
 
-This plugin is HomeBridge verified and [HOOBS](https://hoobs.org/?ref=10876) certified and can be easily installed and configured through their UI.
+## Configuration
 
-If you don't use Homebridge UI or HOOBS, keep reading:
+This plugin requires a Discord bot token to access your Discord server. You can obtain a bot token by following the instructions in the [Discord Developer Portal](https://discord.com/developers/docs/intro).
 
-1. Install homebridge using: `sudo npm install -g homebridge --unsafe-perm`
-2. Install this plugin using: `sudo npm install -g homebridge-network-presence`
-3. Update your configuration file. See `config-sample.json` in this repository for a sample.
+### Configuration File Example
 
-## Config File Example
-
-``` json
-"platforms": [
+```json
+{
+  "platforms": [
     {
-        "platform": "NetworkPresence",
-        "interval": 10,
-        "threshold": 15,
-        "addressRange": "10.0.0.1-10.0.0.120",
-        "anyoneSensor": true,
-        "devices": [ 
-            {
-                "name": "my iPhone",
-                "mac": "cc:29:f5:3b:a2:f2",
-                "threshold": 5
-            },
-            {
-                "name": "my iPad",
-                "ip": "10.0.0.142"
-            },
-            {
-                "name": "my Apple Watch",
-                "hostname": "joes-applewatch.local"
-            }
-
-        ],
-        "debug": false
+      "platform": "DiscordOccupancySensor",
+      "name": "My Server",
+      "token": "your-bot-token",
+      "channelIDs": ["123456789012345678", "234567890123456789"],
+      "debug": false
     }
-]
+  ]
+}
 ```
 
 ### Configurations Table
 
-\* advanced details below
+| Parameter   | Description                                                                                                               | Default | Type          |
+|-------------|---------------------------------------------------------------------------------------------------------------------------|---------|---------------|
+| `platform`  | Always `"DiscordOccupancySensor"`.                                                                                        | -       | String        |
+| `name`      | Name of the platform, displayed in the Homebridge logs.                                                                   | -       | String        |
+| `token`     | Discord bot token to access your Discord server.                                                                          | -       | String        |
+| `channelIDs` | Array of Discord channel IDs to monitor for user activity.                                                                | -       | Array of IDs  |
+| `debug`     | Whether to enable debug logging. If enabled, the plugin will log more information to the console.                          | `false` | Boolean       |
 
-|             Parameter            |                       Description                       |  Default |   type   |
-| -------------------------------- | ------------------------------------------------------- |:--------:|:--------:|
-| `platform`  | always `"NetworkPresence"` |     -    |  String  |
-| `interval`  |  Time in seconds between status polling for connected devices   |  `10` |  Integer |
-| `threshold`  |  Time in minutes to wait before updating 'disconnected' status. important for not spamming your notifications or wrongly activating automation because the device has gone from the network for short time   |  `15` |  Integer |
-| `addressRange`  |  (Optional) Define the address range of your devices to speed up discovery (e.g. "10.0.0.0/24", "10.0.0.1-10.0.0.30")   |   -   |  String |
-| `anyoneSensor`       |  When set to `true`, the plugin will create extra accessory named "Anyone" to represent if ANY of the devices is detected        |  `false` |  Boolean  |
-| `debug`       |  When set to `true`, the plugin will produce extra logs for debugging purposes        |  `false` |  Boolean  |
-| **Devices** | List of devices to monitor (with the below information)| | Array|
-| `name`        | Name of the accessory in HomeKit  |         |  String  |
-| `mac`        | Mac Address of the device e.g. `cc:29:f5:3b:a2:f2` (can use `ip` or `hostname` instead) |         |  String  |
-| `ip`        | ip Address of the device (can use `mac` or `hostname` instead) |         |  String  |
-| `hostname`        | Hostname of the device (can use `mac` or `ip` instead) |         |  String  |
-| `threshold`  | device disconnect threshold (overrides platform threshold)   |  `15` |  Integer |
+## Troubleshooting
 
-## Issues & Debug
+If you encounter any issues with this plugin, check the Homebridge logs first for error messages.
 
-If you experience any issues with the plugins please refer to the [Issues](https://github.com/nitaybz/homebridge-network-presence/issues) tab <!-- or [network-presence Discord Channel](https://discord.gg/7DyabQ6) --> and check if your issue is already described there, if it doesn't, please report a new issue with as much detailed information as you can give (logs are crucial).<br>
-if you want to even speed up the process, you can add `"debug": true` to your config, which will give me more details on the logs and speed up fixing the issue.
+If you need further assistance, feel free to [open an issue](https://github.com/xyzrepo/homebridge-discord-occupancy-sensor/issues) or ask for help in the [Homebridge Discord server](https://discord.gg/7DyabQ6).
 
+## Contributing
 
------------------------
+Contributions are welcome! Please refer to the [contributing guidelines](CONTRIBUTING.md) for more information.
 
-## Support homebridge-network-presence
+## License
 
-**homebridge-network-presence** is a free plugin under the MIT license. it was developed as a contribution to the homebridge/hoobs community with lots of love and thoughts.
-Creating and maintaining Homebridge plugins consume a lot of time and effort and if you would like to share your appreciation, feel free to "Star" or donate.
-
-<a target="blank" href="https://www.paypal.me/nitaybz"><img src="https://img.shields.io/badge/PayPal-Donate-blue.svg?logo=paypal"/></a><br>
-<a target="blank" href="https://www.patreon.com/nitaybz"><img src="https://img.shields.io/badge/PATREON-Become a patron-red.svg?logo=patreon"/></a><br>
-<a target="blank" href="https://ko-fi.com/nitaybz"><img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-29abe0.svg?logo=ko-fi"/></a>
+[MIT](LICENSE)
