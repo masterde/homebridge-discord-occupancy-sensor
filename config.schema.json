@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "DiscordOccupancy",
+  "pluginAlias": "DiscordOccupancySensor",
   "pluginType": "accessory",
   "headerDisplay": "Homebridge plugin that creates an occupancy sensor in HomeKit based on the online status of a Discord user",
   "footerDisplay": "Created by @xyz",
