@@ -1,11 +1,23 @@
 {
   "platforms": [
-      {
-          "platform": "DiscordPresence",
-          "name": "Discord Occupancy Sensor",
-          "token": "YOUR_DISCORD_BOT_TOKEN",
-          "guildId": "YOUR_DISCORD_GUILD_ID",
-          "debug": false
-      }
+    {
+      "platform": "DiscordOccupancySensor",
+      "interval": 10,
+      "threshold": 15,
+      "anyoneSensor": true,
+      "token": "YOUR_DISCORD_BOT_TOKEN",
+      "devices": [
+        {
+          "name": "Joe's iPhone",
+          "discordId": "123456789012345678",
+          "threshold": 5
+        },
+        {
+          "name": "Jane's Android",
+          "discordId": "987654321098765432"
+        }
+      ],
+      "debug": false
+    }
   ]
 }
