@@ -1,98 +1,85 @@
-const DiscordObserver = require("./lib/discord");
+const Discord = require('discord.js');
+const DiscordOccupancySensor = require('./lib/discord.js');
+const PLUGIN_NAME = 'homebridge-discord-presence';
+const PLATFORM_NAME = 'DiscordPresence';
 
-const PLUGIN_NAME = "homebridge-discord-occupancy-sensor";
-const PLATFORM_NAME = "DiscordOccupancySensor";
+module.exports = (api) => {
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordPresence);
+};
 
-class DiscordOccupancySensorPlatform {
+class DiscordPresence {
   constructor(log, config, api) {
-    this.log = log;
     this.api = api;
+    this.log = log;
+
     this.accessories = [];
-    this.devicesConfig = config.devices || [];
-    this.users = config.users || [];
-    this.botToken = config.botToken || "";
+    this.PLUGIN_NAME = PLUGIN_NAME;
+    this.PLATFORM_NAME = PLATFORM_NAME;
+    this.name = config.name || PLATFORM_NAME;
+    this.token = config.token;
+    this.guildId = config.guildId;
+    this.debug = config.debug || false;
 
-    this.discordObserver = new DiscordObserver(this.botToken, this.users);
-    this.discordObserver.on("discord-user:<user-id>:status:<status>", (user) => {
-      const userId = user.id;
-      const status = this.discordObserver.getStatus(userId);
-      this.accessories.forEach((accessory) => {
-        if (accessory.context.serial === userId) {
-          const occupancyDetected = status === "online";
-          accessory
-            .getService(this.api.hap.Service.OccupancySensor)
-            .updateCharacteristic(
-              this.api.hap.Characteristic.OccupancyDetected,
-              occupancyDetected
-            );
-        }
-      });
-    });
+    // define debug method to output debug logs when enabled in the config
+    this.log.easyDebug = (...content) => {
+      if (this.debug) {
+        this.log(content.reduce((previous, current) => {
+          return previous + ' ' + current;
+        }));
+      } else {
+        this.log.debug(content.reduce((previous, current) => {
+          return previous + ' ' + current;
+        }));
+      }
+    };
 
-    this.api.on("didFinishLaunching", () => {
-      removeCachedDevices.bind(this)();
-      init.bind(this)();
+    this.client = new Discord.Client();
+    this.client.on('ready', this.onReady.bind(this));
+
+    this.api.on('didFinishLaunching', () => {
+      this.client.login(this.token);
     });
   }
 
-  configureAccessory(accessory) {
-    this.log(`Found Cached Accessory: ${accessory.displayName} (${accessory.context.serial}) `);
-    this.accessories.push(accessory);
-  }
-}
-
-function removeCachedDevices() {
-  this.accessories.forEach((accessory) => {
-    if (
-      accessory.context.serial === "12:34:56:78:9a:bc" &&
-      accessory.displayName === "Anyone"
-    ) {
-      // If it's the 'Anyone' sensor
+  onReady() {
+    this.log(`Logged in as ${this.client.user.tag}`);
+    const guild = this.client.guilds.cache.get(this.guildId);
+    if (!guild) {
+      this.log.error(`Failed to find guild with ID ${this.guildId}`);
       return;
     }
 
-    const deviceInConfig = this.devicesConfig.find(
-      (device) =>
-        (device.mac &&
-          device.mac.toLowerCase() === accessory.context.serial) ||
-        device.ip === accessory.context.serial ||
-        (device.hostname &&
-          device.hostname.toLowerCase() === accessory.context.serial)
-    );
-    if (!deviceInConfig) {
-      // Unregister accessory if it is no longer in the config
-      this.log(
-        `Unregistering disconnected device: "${accessory.displayName}" (${accessory.context.serial})`
-      );
-      this.api.unregisterPlatformAccessories(
-        PLUGIN_NAME,
-        PLATFORM_NAME,
-        [accessory]
-      );
-    }
-  });
-}
+    // Remove any cached accessories that are no longer in the guild
+    this.accessories.forEach((accessory) => {
+      const serial = accessory.context.serial;
+      if (!guild.members.cache.has(serial)) {
+        this.log(`Removing cached accessory ${accessory.displayName} (${serial})`);
+        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      }
+    });
 
-function init() {
-  this.log(`Initiating Discord Observer...`);
-  this.devicesConfig.forEach((device) => {
-    if (this.users.includes(device.id)) {
-      const userId = device.id;
-      const displayName = device.name || userId;
-      const accessory = new this.api.platformAccessory(displayName, userId);
-      accessory.addService(this.api.hap.Service.OccupancySensor, displayName);
-      this.accessories.push(accessory);
-    }
-  });
+    guild.members.fetch()
+      .then((members) => {
+        members.each((member) => {
+          if (this.accessories.some((accessory) => accessory.context.serial === member.id)) {
+            // Accessory already exists for this member, skip
+            return;
+          }
 
-  if (config.anyoneSensor) {
-    const displayName = "Anyone";
-    const accessory = new this.api.platformAccessory(displayName, "12:34:56:78:9a:bc");
-    accessory.addService(this.api.hap.Service.OccupancySensor, displayName);
+          this.log(`Adding accessory for ${member.displayName} (${member.id})`);
+          const accessory = new DiscordOccupancySensor(guild, {
+            name: member.displayName,
+          }, this);
+          this.accessories.push(accessory.accessory);
+        });
+      })
+      .catch((error) => {
+        this.log.error(`Failed to fetch guild members: ${error}`);
+      });
+  }
+
+  configureAccessory(accessory) {
+    this.log.easyDebug(`Found Cached Accessory: ${accessory.displayName} (${accessory.context.serial}) `);
     this.accessories.push(accessory);
   }
 }
-
-module.exports = (api) => {
-  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensorPlatform);
-};

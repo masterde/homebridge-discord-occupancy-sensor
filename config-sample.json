@@ -1,28 +1,11 @@
 {
-    "platforms": [
-        {
-            "platform": "NetworkPresence",
-            "interval": 10,
-            "threshold": 15,
-            "anyoneSensor": true,
-            "addressRange": "10.0.0.0/24",
-            "devices": [ 
-                {
-                    "name": "my iPhone",
-                    "mac": "cc:29:f5:3b:a2:f2",
-                    "threshold": 5
-                },
-                {
-                    "name": "my iPad",
-                    "ip": "10.0.0.142"
-                },
-                {
-                    "name": "my Apple Watch",
-                    "hostname": "joes-applewatch.local"
-                }
-
-            ],
-            "debug": false
-        }
-    ]
+  "platforms": [
+      {
+          "platform": "DiscordPresence",
+          "name": "Discord Occupancy Sensor",
+          "token": "YOUR_DISCORD_BOT_TOKEN",
+          "guildId": "YOUR_DISCORD_GUILD_ID",
+          "debug": false
+      }
+  ]
 }

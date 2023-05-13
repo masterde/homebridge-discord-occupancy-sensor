@@ -1,47 +1,52 @@
 {
-  "pluginAlias": "DiscordOccupancySensor",
-  "pluginType": "accessory",
-  "headerDisplay": "Homebridge plugin that creates an occupancy sensor in HomeKit based on the online status of a Discord user",
-  "footerDisplay": "Created by @xyz",
+  "pluginAlias": "DiscordPresence",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Homebridge plugin that provides occupancy sensors for Discord user presence in a specified guild",
+  "footerDisplay": "Created by @yourusername",
   "schema": {
     "type": "object",
     "properties": {
+      "name": {
+        "title": "Name",
+        "description": "The name of the occupancy sensor accessory",
+        "type": "string",
+        "default": "Discord Occupancy Sensor"
+      },
+      "token": {
+        "title": "Discord Bot Token",
+        "description": "The Discord bot token used to authenticate with the Discord API",
+        "type": "string",
+        "required": true
+      },
+      "guildId": {
+        "title": "Discord Guild ID",
+        "description": "The ID of the Discord guild to monitor for presence",
+        "type": "string",
+        "required": true
+      },
       "debug": {
-        "title": "Enable Debug Logs",
+        "title": "Enable Debug Logging",
         "description": "When checked, the plugin will produce extra logs for debugging purposes",
         "type": "boolean",
         "default": false,
         "required": false
-      },
-      "token": {
-        "title": "Discord Bot Token",
-        "description": "The token for your Discord bot",
-        "type": "string",
-        "required": true
-      },
-      "userId": {
-        "title": "Discord User ID",
-        "description": "The ID of the Discord user to monitor",
-        "type": "string",
-        "required": true
-      },
-      "name": {
-        "title": "Sensor Name",
-        "description": "The name of the occupancy sensor to create in HomeKit",
-        "type": "string",
-        "required": true
       }
-    }
+    },
+    "required": [
+      "token",
+      "guildId"
+    ]
   },
   "layout": [
+    {
+      "key": "name"
+    },
     {
       "key": "token"
     },
     {
-      "key": "userId"
-    },
-    {
-      "key": "name"
+      "key": "guildId"
     },
     {
       "key": "debug"
