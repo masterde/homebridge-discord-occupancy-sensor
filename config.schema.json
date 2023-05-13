@@ -1,52 +1,108 @@
 {
-  "pluginAlias": "DiscordPresence",
+  "pluginAlias": "DiscordOccupancySensor",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Homebridge plugin that provides occupancy sensors for Discord user presence in a specified guild",
+  "headerDisplay": "Homebridge plugin that provides occupancy sensors for Discord presence",
   "footerDisplay": "Created by @xyz",
   "schema": {
     "type": "object",
     "properties": {
-      "name": {
-        "title": "Name",
-        "description": "The name of the occupancy sensor accessory",
-        "type": "string",
-        "default": "Discord Occupancy Sensor"
-      },
-      "token": {
-        "title": "Discord Bot Token",
-        "description": "The Discord bot token used to authenticate with the Discord API",
-        "type": "string",
-        "required": true
-      },
-      "guildId": {
-        "title": "Discord Guild ID",
-        "description": "The ID of the Discord guild to monitor for presence",
-        "type": "string",
-        "required": true
-      },
       "debug": {
-        "title": "Enable Debug Logging",
+        "title": "Enable Debug Logs",
         "description": "When checked, the plugin will produce extra logs for debugging purposes",
         "type": "boolean",
         "default": false,
         "required": false
+      },
+      "interval": {
+        "title": "Polling Interval for New Devices (seconds)",
+        "description": "Time in seconds between status polling",
+        "type": "integer",
+        "default": 10,
+        "minimum": 1,
+        "maximum": 60
+      },
+      "threshold": {
+        "title": "Disconnect Threshold (minutes)",
+        "description": "Time in minutes to wait before updating 'disconnected' status",
+        "type": "integer",
+        "required": true,
+        "default": 15,
+        "minimum": 0,
+        "maximum": 60
+      },
+      "anyoneSensor": {
+        "title": "Enable Anyone Sensor",
+        "description": "When checked, the plugin will create an extra accessory named \"Anyone\" to represent if ANY of the devices is detected",
+        "type": "boolean",
+        "default": false,
+        "required": false
+      },
+      "token": {
+        "title": "Discord Token",
+        "description": "The token for the Discord bot account that will be used to monitor user presence",
+        "type": "string",
+        "required": true
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "title": "Discord Users",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name of the Accessory",
+              "type": "string",
+              "required": true
+            },
+            "discordId": {
+              "title": "Discord User ID",
+              "type": "string",
+              "required": true
+            },
+            "threshold": {
+              "title": "Disconnect Threshold (minutes)",
+              "description": "Time in minutes to wait before updating 'disconnected' status",
+              "type": "integer",
+              "default": 15,
+              "minimum": 0,
+              "maximum": 60
+            }
+          }
+        }
       }
-    },
-    "required": [
-      "token",
-      "guildId"
-    ]
+    }
   },
   "layout": [
     {
-      "key": "name"
+      "key": "interval"
+    },
+    {
+      "key": "threshold"
+    },
+    {
+      "key": "anyoneSensor"
     },
     {
       "key": "token"
     },
     {
-      "key": "guildId"
+      "key": "devices",
+      "type": "array",
+      "title": "Discord Users",
+      "orderable": false,
+      "buttonText": "Add User",
+      "items": [
+        {
+          "key": "devices[].name"
+        },
+        {
+          "key": "devices[].discordId"
+        },
+        {
+          "key": "devices[].threshold"
+        }
+      ]
     },
     {
       "key": "debug"
