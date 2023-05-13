@@ -1,6 +1,6 @@
 {
   "name": "homebridge-discord-occupancy-sensor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Homebridge plugin that provides occupancy sensors based on Discord user presence",
   "main": "index.js",
   "keywords": [
