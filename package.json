@@ -1,6 +1,6 @@
 {
   "name": "homebridge-discord-occupancy-sensor",
-  "version": "1.0.7-alpha.12",
+  "version": "1.0.7-alpha.14",
   "description": "Homebridge plugin that provides occupancy sensors for Discord presence",
   "main": "index.js",
   "keywords": [
@@ -39,5 +39,8 @@
       "type": "ko-fi",
       "url": "https://ko-fi.com/xyzrepo"
     }
-  ]
+  ],
+  "volta": {
+    "node": "18.16.0"
+  }
 }
