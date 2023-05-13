@@ -55,7 +55,7 @@
               "type": "string",
               "required": true
             },
-            "discordId": {
+            "id": {
               "title": "Discord User ID",
               "type": "string",
               "required": true
@@ -97,7 +97,7 @@
           "key": "devices[].name"
         },
         {
-          "key": "devices[].discordId"
+          "key": "devices[].id"
         },
         {
           "key": "devices[].threshold"
