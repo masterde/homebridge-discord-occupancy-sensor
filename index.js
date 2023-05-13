@@ -1,4 +1,4 @@
-const DiscordObserver = require("./lib/discordObserver");
+const DiscordObserver = require("./lib/discord");
 
 const PLUGIN_NAME = "homebridge-discord-occupancy-sensor";
 const PLATFORM_NAME = "DiscordOccupancySensor";
