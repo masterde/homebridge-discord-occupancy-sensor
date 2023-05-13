@@ -1,6 +1,6 @@
 const PLUGIN_NAME = 'homebridge-discord-occupancy-sensor';
 const PLATFORM_NAME = 'DiscordOccupancySensor';
-const { DiscordObserver } = require('./lib/discord');
+const { DiscordObserver, init } = require('./lib/discord');
 
 module.exports = api => {
   api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensor);
@@ -38,7 +38,7 @@ class DiscordOccupancySensor {
       }
     };
 
-    this.api.on('didFinishLaunching', this.discordObserver.init());
+    this.api.on('didFinishLaunching', this.discordObserver.start.bind(this.discordObserver));
   }
 
   configureAccessory(accessory) {

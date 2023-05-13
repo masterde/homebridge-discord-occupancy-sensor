@@ -93,15 +93,9 @@
       "orderable": false,
       "buttonText": "Add User",
       "items": [
-        {
-          "key": "devices[].name"
-        },
-        {
-          "key": "devices[].id"
-        },
-        {
-          "key": "devices[].threshold"
-        }
+          "devices[].name",
+          "devices[].id",
+          "devices[].threshold"
       ]
     },
     {
