@@ -42,4 +42,4 @@ class DiscordOccupancySensor {
   }
 }
 
-module.exports = new DiscordOccupancySensor;
+module.exports = DiscordOccupancySensor;
