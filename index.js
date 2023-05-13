@@ -1,12 +1,7 @@
-const { Accessory, Service, Characteristic } = require("hap-nodejs");
 const DiscordObserver = require("./lib/discordObserver");
 
 const PLUGIN_NAME = "homebridge-discord-occupancy-sensor";
 const PLATFORM_NAME = "DiscordOccupancySensor";
-
-module.exports = (api) => {
-  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensorPlatform);
-};
 
 class DiscordOccupancySensorPlatform {
   constructor(log, config, api) {
@@ -25,9 +20,9 @@ class DiscordOccupancySensorPlatform {
         if (accessory.context.serial === userId) {
           const occupancyDetected = status === "online";
           accessory
-            .getService(Service.OccupancySensor)
-            .setCharacteristic(
-              Characteristic.OccupancyDetected,
+            .getService(this.api.hap.Service.OccupancySensor)
+            .updateCharacteristic(
+              this.api.hap.Characteristic.OccupancyDetected,
               occupancyDetected
             );
         }
@@ -46,7 +41,7 @@ class DiscordOccupancySensorPlatform {
   }
 }
 
-const removeCachedDevices = function () {
+function removeCachedDevices() {
   this.accessories.forEach((accessory) => {
     if (
       accessory.context.serial === "12:34:56:78:9a:bc" &&
@@ -76,24 +71,28 @@ const removeCachedDevices = function () {
       );
     }
   });
-};
+}
 
-const init = function () {
+function init() {
   this.log(`Initiating Discord Observer...`);
   this.devicesConfig.forEach((device) => {
     if (this.users.includes(device.id)) {
       const userId = device.id;
       const displayName = device.name || userId;
-      const accessory = new Accessory(displayName, userId, this);
-      accessory.addService(Service.OccupancySensor, displayName);
+      const accessory = new this.api.platformAccessory(displayName, userId);
+      accessory.addService(this.api.hap.Service.OccupancySensor, displayName);
       this.accessories.push(accessory);
     }
   });
 
   if (config.anyoneSensor) {
     const displayName = "Anyone";
-    const accessory = new Accessory(displayName, "12:34:56:78:9a:bc", this);
-    accessory.addService(Service.OccupancySensor, displayName);
+    const accessory = new this.api.platformAccessory(displayName, "12:34:56:78:9a:bc");
+    accessory.addService(this.api.hap.Service.OccupancySensor, displayName);
     this.accessories.push(accessory);
   }
+}
+
+module.exports = (api) => {
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensorPlatform);
 };
