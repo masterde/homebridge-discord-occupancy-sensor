@@ -38,7 +38,7 @@ class DiscordOccupancySensor {
       }
     };
 
-    this.api.on('didFinishLaunching', this.discordObserver.init.bind(this));
+    this.api.on('didFinishLaunching', this.discordObserver.init());
   }
 
   configureAccessory(accessory) {
