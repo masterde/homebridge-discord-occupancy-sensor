@@ -33,8 +33,22 @@ class DiscordPresence {
       }
     };
 
-    this.client = new Discord.Client();
+    // Create a new Discord client with the proper intents
+    this.client = new Discord.Client({
+      intents: [
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_MEMBERS,
+        Discord.Intents.FLAGS.PRESENCE_UPDATE
+      ]
+    });
+    // this.client = new Discord.Client();
     this.client.on('ready', this.onReady.bind(this));
+    
+    this.client.login('your-bot-token').then(() => {
+      this.log('Discord bot is ready');
+    }).catch(error => {
+      this.log.error(`Failed to log in to Discord: ${error}`);
+    });
 
     this.api.on('didFinishLaunching', () => {
       this.client.login(this.token);
