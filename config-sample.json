@@ -9,12 +9,12 @@
       "devices": [
         {
           "name": "Joe's iPhone",
-          "discordId": "123456789012345678",
+          "id": "123456789012345678",
           "threshold": 5
         },
         {
           "name": "Jane's Android",
-          "discordId": "987654321098765432"
+          "id": "987654321098765432"
         }
       ],
       "debug": false
