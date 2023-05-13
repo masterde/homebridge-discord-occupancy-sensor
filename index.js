@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { Client, Intents } = require('discord.js');
 const DiscordOccupancySensor = require('./lib/discord.js');
 const PLUGIN_NAME = 'homebridge-discord-presence';
 const PLATFORM_NAME = 'DiscordPresence';
@@ -34,11 +34,11 @@ class DiscordPresence {
     };
 
     // Create a new Discord client with the proper intents
-    this.client = new Discord.Client({
+    this.client = new Client({
       intents: [
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_MEMBERS,
-        Discord.Intents.FLAGS.PRESENCE_UPDATE
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.PRESENCE_UPDATE
       ]
     });
     // this.client = new Discord.Client();

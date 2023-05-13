@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Homebridge plugin that provides occupancy sensors for Discord user presence in a specified guild",
-  "footerDisplay": "Created by @yourusername",
+  "footerDisplay": "Created by @xyz",
   "schema": {
     "type": "object",
     "properties": {
