@@ -2,9 +2,9 @@ const PLUGIN_NAME = 'homebridge-discord-occupancy-sensor';
 const PLATFORM_NAME = 'DiscordOccupancySensor';
 const DiscordObserver = require('./lib/discord');
 
-module.exports = api => {
-  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensor);
-};
+// module.exports = api => {
+//   api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensor);
+// };
 
 class DiscordOccupancySensor {
   constructor(log, config, api) {
@@ -42,4 +42,8 @@ class DiscordOccupancySensor {
   }
 }
 
-module.exports = DiscordOccupancySensor;
+module.exports = api => {
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, (log, config, api) => {
+    return new DiscordOccupancySensor(log, config, api);
+  });
+};
