@@ -14,7 +14,7 @@ class DiscordOccupancySensor {
     this.PLATFORM_NAME = PLATFORM_NAME;
     this.accessories = [];
     this.debug = config.debug || false;
-    this.discordObserver = new DiscordObserver(config);
+    this.discordObserver = new DiscordObserver(config, this);
     this.api = api;
 
     // Define debug method to output debug logs when enabled in the config
@@ -37,12 +37,12 @@ class DiscordOccupancySensor {
 
   createAccessories() {
     this.devicesConfig.forEach(device => {
-      this.accessories.push(new Accessory(device, this));
+      this.accessories.push(new Accessory(device, this.api.hap, this));
     });
   }
 
   configureAccessory(accessory) {
-    this.log.easyDebug(`Found cached accessory: ${ accessory.displayName }(${ accessory.context.serial })`);
+    this.log.easyDebug(`Found cached accessory: ${accessory.displayName} (${accessory.context.serial})`);
     this.accessories.push(accessory);
   }
 
