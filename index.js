@@ -1,15 +1,7 @@
 const PLUGIN_NAME = 'homebridge-discord-occupancy-sensor';
 const PLATFORM_NAME = 'DiscordOccupancySensor';
-const { DiscordObserver, init } = require('./lib/discord');
-
-module.exports = api => {
-  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensor);
-};
-// module.exports = api => {
-//   api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, (log, config, api) => {
-//     return new DiscordOccupancySensor(log, config, api);
-//   });
-// };
+const { DiscordObserver } = require('./lib/discord');
+const Accessory = require('./lib/accessory');
 
 class DiscordOccupancySensor {
   constructor(log, config, api) {
@@ -22,27 +14,43 @@ class DiscordOccupancySensor {
     this.PLATFORM_NAME = PLATFORM_NAME;
     this.accessories = [];
     this.debug = config.debug || false;
-    this.discordObserver = new DiscordObserver(config, this);
+    this.discordObserver = new DiscordObserver(config);
     this.api = api;
 
-    // define debug method to output debug logs when enabled in the config
+    // Define debug method to output debug logs when enabled in the config
     this.log.easyDebug = (...content) => {
       if (this.debug) {
-        this.log(content.reduce((previous, current) => {
-          return previous + ' ' + current;
-        }));
+        this.log(content.reduce((previous, current) => previous + ' ' + current));
       } else {
-        this.log.debug(content.reduce((previous, current) => {
-          return previous + ' ' + current;
-        }));
+        this.log.debug(content.reduce((previous, current) => previous + ' ' + current));
       }
     };
 
-    this.api.on('didFinishLaunching', this.discordObserver.bind(this));
+    this.api.on('didFinishLaunching', () => {
+      this.log.easyDebug('Initializing DiscordObserver');
+      this.discordObserver.on('ready', () => {
+        this.log.easyDebug('DiscordObserver is ready');
+        this.createAccessories();
+      });
+    });
+  }
+
+  createAccessories() {
+    this.devicesConfig.forEach(device => {
+      this.accessories.push(new Accessory(device, this));
+    });
   }
 
   configureAccessory(accessory) {
-    this.log.easyDebug(`Found cached accessory: ${accessory.displayName} (${accessory.context.serial})`);
+    this.log.easyDebug(`Found cached accessory: ${ accessory.displayName }(${ accessory.context.serial })`);
     this.accessories.push(accessory);
   }
+
+  accessories(callback) {
+    callback(this.accessories);
+  }
 }
+
+module.exports = api => {
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, DiscordOccupancySensor);
+};
